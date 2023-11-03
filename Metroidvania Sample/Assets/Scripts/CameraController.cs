@@ -1,5 +1,3 @@
-using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
 
 public class CameraController : MonoBehaviour
@@ -25,6 +23,7 @@ public class CameraController : MonoBehaviour
 		Move();
 	}
 
+	// Moves the camera according to the player position and scene bounds
 	private void Move()
 	{
 		if (playerController == null)

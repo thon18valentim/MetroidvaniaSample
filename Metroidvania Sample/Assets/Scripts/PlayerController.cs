@@ -1,5 +1,3 @@
-using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
 
 public class PlayerController : MonoBehaviour
@@ -14,15 +12,13 @@ public class PlayerController : MonoBehaviour
 	private bool isJumping;
 	public LayerMask groundLayer;
 
+	public BulletControler bullet;
+	public Transform shotCheckPoint;
+
 	private void Awake()
 	{
 		rb = GetComponent<Rigidbody2D>();
 		anim = transform.GetChild(0).GetComponent<Animator>();
-	}
-
-	void Start()
-	{
-		
 	}
 
 	void Update()
@@ -30,6 +26,7 @@ public class PlayerController : MonoBehaviour
 		Move();
 		Flip();
 		Jump();
+		Shot();
 	}
 
 	// Move action according to speed
@@ -66,6 +63,15 @@ public class PlayerController : MonoBehaviour
 		if (rb.velocity.x > 0)
 		{
 			transform.localScale = new Vector3(1f, 1f, 1f);
+		}
+	}
+
+	private void Shot()
+	{
+		if (Input.GetButtonDown("Fire1"))
+		{
+			var _bullet = Instantiate(bullet, shotCheckPoint.position, shotCheckPoint.rotation);
+			_bullet.moveDir = new Vector2(transform.localScale.x, 0f);
 		}
 	}
 }
