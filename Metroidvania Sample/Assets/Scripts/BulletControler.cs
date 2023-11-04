@@ -7,6 +7,8 @@ public class BulletControler : MonoBehaviour
 
 	public Vector2 moveDir;
 
+	public GameObject impactEffect;
+
 	private void Awake()
 	{
 		rb = GetComponent<Rigidbody2D>();
@@ -26,6 +28,7 @@ public class BulletControler : MonoBehaviour
 	// Destroy the bullet obj when it hits something
 	private void OnTriggerEnter2D(Collider2D collision)
 	{
+		Instantiate(impactEffect, transform.position, Quaternion.identity);
 		Destroy(gameObject);
 	}
 

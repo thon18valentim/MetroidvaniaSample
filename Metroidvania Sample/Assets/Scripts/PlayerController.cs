@@ -15,6 +15,8 @@ public class PlayerController : MonoBehaviour
 	public BulletControler bullet;
 	public Transform shotCheckPoint;
 
+	private bool canDoubleJump;
+
 	private void Awake()
 	{
 		rb = GetComponent<Rigidbody2D>();
@@ -41,8 +43,18 @@ public class PlayerController : MonoBehaviour
 	{
 		isJumping = !Physics2D.OverlapCircle(groundCheckPoint.position, .2f, groundLayer);
 
-		if (Input.GetButtonDown("Jump") && !isJumping)
+		if (Input.GetButtonDown("Jump") && (!isJumping || canDoubleJump))
 		{
+			if (!isJumping)
+			{
+				canDoubleJump = true;
+			}
+			else
+			{
+				canDoubleJump = false;
+				anim.SetTrigger("doubleJump");
+			}
+
 			rb.velocity = new Vector2(rb.velocity.x, jumpForce);
 			isJumping = true;
 		}
@@ -66,12 +78,15 @@ public class PlayerController : MonoBehaviour
 		}
 	}
 
+	// Shots a bullet in the direction which the player is looking
 	private void Shot()
 	{
 		if (Input.GetButtonDown("Fire1"))
 		{
 			var _bullet = Instantiate(bullet, shotCheckPoint.position, shotCheckPoint.rotation);
 			_bullet.moveDir = new Vector2(transform.localScale.x, 0f);
+
+			anim.SetTrigger("shotFired");
 		}
 	}
 }
