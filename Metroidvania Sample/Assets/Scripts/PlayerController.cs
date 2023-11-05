@@ -17,14 +17,27 @@ public class PlayerController : MonoBehaviour
 
 	private bool canDoubleJump;
 
+	public float dashSpeed, dashTime;
+	public float dashCooldown;
+	private float dashCounter;
+	private float dashRechargeCounter;
+
+	private SpriteRenderer sr;
+	public SpriteRenderer afterEffectImage;
+	public float afterEffectLifetime, timeBetweenAfterEffect;
+	private float afterEffectCounter;
+	public Color afterEffectColor;
+
 	private void Awake()
 	{
 		rb = GetComponent<Rigidbody2D>();
 		anim = transform.GetChild(0).GetComponent<Animator>();
+		sr = transform.GetChild(0).GetComponent<SpriteRenderer>();
 	}
 
 	void Update()
 	{
+		Dash();
 		Move();
 		Flip();
 		Jump();
@@ -34,8 +47,43 @@ public class PlayerController : MonoBehaviour
 	// Move action according to speed
 	private void Move()
 	{
+		// Cannot move during a dash
+		if (dashCounter > 0)
+			return;
+
 		rb.velocity = new Vector2(Input.GetAxisRaw("Horizontal") * moveSpeeed, rb.velocity.y);
 		anim.SetFloat("speed", Mathf.Abs(rb.velocity.x));
+	}
+
+	// Handle dash action
+	private void Dash()
+	{
+		if (dashRechargeCounter > 0)
+		{
+			dashRechargeCounter -= Time.deltaTime;
+		}
+		else
+		{
+			if (Input.GetButtonDown("Fire2"))
+			{
+				dashCounter = dashTime;
+				ShowAfterEffect();
+			}
+		}
+
+		if (dashCounter > 0)
+		{
+			dashCounter -= Time.deltaTime;
+			rb.velocity = new Vector2(dashSpeed * transform.localScale.x, rb.velocity.y);
+
+			afterEffectCounter -= Time.deltaTime;
+			if (afterEffectCounter <= 0)
+			{
+				ShowAfterEffect();
+			}
+
+			dashRechargeCounter = dashCooldown;
+		}
 	}
 
 	// Jump action and ground detecting
@@ -88,5 +136,16 @@ public class PlayerController : MonoBehaviour
 
 			anim.SetTrigger("shotFired");
 		}
+	}
+
+	// Show After Effect according to settings
+	private void ShowAfterEffect()
+	{
+		var effect = Instantiate(afterEffectImage, transform.position, transform.rotation);
+		effect.sprite = sr.sprite;
+		effect.transform.localScale = transform.localScale;
+		effect.color = afterEffectColor;
+
+		Destroy(effect.gameObject, afterEffectLifetime);
 	}
 }

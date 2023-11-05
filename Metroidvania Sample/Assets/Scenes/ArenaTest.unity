@@ -237,8 +237,8 @@ SpriteRenderer:
   m_AutoUVMaxDistance: 0.5
   m_AutoUVMaxAngle: 89
   m_LightmapParameters: {fileID: 0}
-  m_SortingLayerID: 0
-  m_SortingLayer: 0
+  m_SortingLayerID: 71328269
+  m_SortingLayer: 1
   m_SortingOrder: 0
   m_Sprite: {fileID: 7815371044791450175, guid: 3607ff319a5a56141aa94c66e33ca304, type: 3}
   m_Color: {r: 1, g: 1, b: 1, a: 1}
@@ -4247,3 +4247,10 @@ MonoBehaviour:
     m_Bits: 64
   bullet: {fileID: 5165422422741620253, guid: 22f8986e4c9da924a81b6c7a4de8668e, type: 3}
   shotCheckPoint: {fileID: 770383607}
+  dashSpeed: 25
+  dashTime: 0.2
+  dashCooldown: 0.25
+  afterEffectImage: {fileID: 3980130834526702452, guid: a6fcf6ac01af50e438e4cc920f91a882, type: 3}
+  afterEffectLifetime: 0.5
+  timeBetweenAfterEffect: 0.033333335
+  afterEffectColor: {r: 0.14117648, g: 0.6, b: 0.9529412, a: 0.7058824}
