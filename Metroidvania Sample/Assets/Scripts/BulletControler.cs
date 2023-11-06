@@ -9,6 +9,8 @@ public class BulletControler : MonoBehaviour
 
 	public GameObject impactEffect;
 
+	public int damage;
+
 	private void Awake()
 	{
 		rb = GetComponent<Rigidbody2D>();
@@ -28,6 +30,11 @@ public class BulletControler : MonoBehaviour
 	// Destroy the bullet obj when it hits something
 	private void OnTriggerEnter2D(Collider2D collision)
 	{
+		if (collision.tag == "Enemy")
+		{
+			collision.GetComponent<HealthController>().TakeDamage(damage);
+		}
+
 		Instantiate(impactEffect, transform.position, Quaternion.identity);
 		Destroy(gameObject);
 	}

@@ -157,3 +157,4 @@ MonoBehaviour:
   bulletSpeed: 12
   moveDir: {x: 1, y: 0}
   impactEffect: {fileID: 7631844794768575417, guid: caf5ccfdfe6033f419a1690405902cf1, type: 3}
+  damage: 25
