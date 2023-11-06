@@ -14,8 +14,8 @@ TagManager:
   - Ground
   - Shot
   - Player
-  - 
-  - 
+  - Destructible
+  - PickUps
   - 
   - 
   - 

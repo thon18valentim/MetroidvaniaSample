@@ -117,3 +117,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   detonationCounter: 0.5
   explosion: {fileID: 6107652762207822175, guid: 8411d3b1b4660954fb65e934f17eeb92, type: 3}
+  blastRange: 1.5
+  destructibleMask:
+    serializedVersion: 2
+    m_Bits: 512

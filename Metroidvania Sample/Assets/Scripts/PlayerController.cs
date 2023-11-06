@@ -72,7 +72,7 @@ public class PlayerController : MonoBehaviour
 		else
 		{
 			// Can only dash in standing mode
-			if (Input.GetButtonDown("Fire2") && standing.activeSelf)
+			if (Input.GetButtonDown("Fire2") && standing.activeSelf && PlayerProfile.AbilityManager.IsAbilityUnlocked(AbilitiyType.Dash))
 			{
 				dashCounter = dashTime;
 				ShowAfterEffect();
@@ -100,7 +100,7 @@ public class PlayerController : MonoBehaviour
 	{
 		isJumping = !Physics2D.OverlapCircle(groundCheckPoint.position, .2f, groundLayer);
 
-		if (Input.GetButtonDown("Jump") && (!isJumping || canDoubleJump))
+		if (Input.GetButtonDown("Jump") && (!isJumping || (canDoubleJump && PlayerProfile.AbilityManager.IsAbilityUnlocked(AbilitiyType.DoubleJump))))
 		{
 			if (!isJumping)
 			{
@@ -157,7 +157,7 @@ public class PlayerController : MonoBehaviour
 	// Handle bomb throwing
 	private void DroppingBombs()
 	{
-		if (!ball.activeSelf)
+		if (!ball.activeSelf || !PlayerProfile.AbilityManager.IsAbilityUnlocked(AbilitiyType.DropBomb))
 			return;
 
 		Instantiate(bomb, bombPosition.position, bombPosition.rotation);
@@ -179,7 +179,7 @@ public class PlayerController : MonoBehaviour
 	{
 		if (!ball.activeSelf)
 		{
-			if (Input.GetAxisRaw("Vertical") < -.9f)
+			if (Input.GetAxisRaw("Vertical") < -.9f && PlayerProfile.AbilityManager.IsAbilityUnlocked(AbilitiyType.BecomeBall))
 			{
 				ballCounter -= Time.deltaTime;
 				if (ballCounter <= 0)
