@@ -3,7 +3,7 @@ using UnityEngine;
 public class PlayerController : MonoBehaviour
 {
 	private Rigidbody2D rb;
-	private Animator anim;
+	public Animator anim;
 
 	public float moveSpeeed;
 	public float jumpForce;
@@ -22,17 +22,23 @@ public class PlayerController : MonoBehaviour
 	private float dashCounter;
 	private float dashRechargeCounter;
 
-	private SpriteRenderer sr;
+	public SpriteRenderer sr;
 	public SpriteRenderer afterEffectImage;
 	public float afterEffectLifetime, timeBetweenAfterEffect;
 	private float afterEffectCounter;
 	public Color afterEffectColor;
 
+	public GameObject standing, ball;
+	public float ballCooldown;
+	private float ballCounter;
+	public Animator ballAnim;
+
+	public Transform bombPosition;
+	public GameObject bomb;
+
 	private void Awake()
 	{
 		rb = GetComponent<Rigidbody2D>();
-		anim = transform.GetChild(0).GetComponent<Animator>();
-		sr = transform.GetChild(0).GetComponent<SpriteRenderer>();
 	}
 
 	void Update()
@@ -42,6 +48,7 @@ public class PlayerController : MonoBehaviour
 		Flip();
 		Jump();
 		Shot();
+		BallMode();
 	}
 
 	// Move action according to speed
@@ -64,7 +71,8 @@ public class PlayerController : MonoBehaviour
 		}
 		else
 		{
-			if (Input.GetButtonDown("Fire2"))
+			// Can only dash in standing mode
+			if (Input.GetButtonDown("Fire2") && standing.activeSelf)
 			{
 				dashCounter = dashTime;
 				ShowAfterEffect();
@@ -80,6 +88,7 @@ public class PlayerController : MonoBehaviour
 			if (afterEffectCounter <= 0)
 			{
 				ShowAfterEffect();
+				afterEffectCounter = timeBetweenAfterEffect;
 			}
 
 			dashRechargeCounter = dashCooldown;
@@ -131,11 +140,27 @@ public class PlayerController : MonoBehaviour
 	{
 		if (Input.GetButtonDown("Fire1"))
 		{
-			var _bullet = Instantiate(bullet, shotCheckPoint.position, shotCheckPoint.rotation);
-			_bullet.moveDir = new Vector2(transform.localScale.x, 0f);
+			if (standing.activeSelf)
+			{
+				var _bullet = Instantiate(bullet, shotCheckPoint.position, shotCheckPoint.rotation);
+				_bullet.moveDir = new Vector2(transform.localScale.x, 0f);
 
-			anim.SetTrigger("shotFired");
+				anim.SetTrigger("shotFired");
+			}
+			else
+			{
+				DroppingBombs();
+			}
 		}
+	}
+
+	// Handle bomb throwing
+	private void DroppingBombs()
+	{
+		if (!ball.activeSelf)
+			return;
+
+		Instantiate(bomb, bombPosition.position, bombPosition.rotation);
 	}
 
 	// Show After Effect according to settings
@@ -147,5 +172,44 @@ public class PlayerController : MonoBehaviour
 		effect.color = afterEffectColor;
 
 		Destroy(effect.gameObject, afterEffectLifetime);
+	}
+
+	// Handle ball mode
+	private void BallMode()
+	{
+		if (!ball.activeSelf)
+		{
+			if (Input.GetAxisRaw("Vertical") < -.9f)
+			{
+				ballCounter -= Time.deltaTime;
+				if (ballCounter <= 0)
+				{
+					ball.SetActive(true);
+					standing.SetActive(false);
+				}
+			}
+			else
+			{
+				ballCounter = ballCooldown;
+			}
+		}
+		else
+		{
+			if (Input.GetAxisRaw("Vertical") > .9f)
+			{
+				ballCounter -= Time.deltaTime;
+				if (ballCounter <= 0)
+				{
+					ball.SetActive(false);
+					standing.SetActive(true);
+				}
+			}
+			else
+			{
+				ballCounter = ballCooldown;
+			}
+
+			ballAnim.SetFloat("speed", Mathf.Abs(rb.velocity.x));
+		}
 	}
 }
