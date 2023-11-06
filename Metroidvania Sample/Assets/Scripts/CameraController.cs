@@ -15,7 +15,7 @@ public class CameraController : MonoBehaviour
 
 	void Start()
 	{
-		playerController = FindObjectOfType<PlayerController>();
+		playerController = Startup.playerController;
 	}
 
 	void Update()
