@@ -2,35 +2,164 @@ using UnityEngine;
 
 public class HealthController : MonoBehaviour
 {
-	public int totalHealt = 100;
-	private int health;
+	private Rigidbody2D rb;
 
+	[Header("Health")]
+	public int totalHealt;
+	private int health;
+	public bool isPlayer = false;
+
+	[Header("Effects gameObject")]
 	public GameObject deathEffect;
 
-	private void Start()
+	[Header("Invicibility")]
+	public float invicibilityLenght;
+	private float invicibilityCounter = 0;
+
+	[Header("Damage flash")]
+	public float flashLenght;
+	private float flashCounter = 0;
+
+	[Header("Character Sprites for flashing effect")]
+	public SpriteRenderer[] characterSprites;
+
+	[Header("How far the character is knock back after take damage")]
+	public float verticalKnockBackForce;
+	public float horizontalKnockBackForce;
+
+	private void Awake()
 	{
+		rb = GetComponent<Rigidbody2D>();
+		if (isPlayer)
+			totalHealt = PlayerProfile.PlayerMaxLife;
 		health = totalHealt;
 	}
 
-	// Handle damage taken
-	public void TakeDamage(int damage, string tag = "Enemy")
+	void Update()
 	{
-		health -= damage;
+		PlayInvincibleEffect();
+	}
+
+	// Handle damage taken
+	public void TakeDamage(int _damage, Transform _aggressor, string _tag = "Enemy")
+	{
+		if (invicibilityCounter > 0)
+			return;
+
+		health -= _damage;
+
+		UpdateHealthBar(_tag);
+
 		if (health <= 0)
 		{
-			if (deathEffect != null)
+			PlayDeathEffect();
+			Kill(_tag);
+		}
+		else
+		{
+			if (_tag == "Player")
 			{
-				Instantiate(deathEffect, transform.position, transform.rotation);
+				invicibilityCounter = invicibilityLenght;
+				KnockBack(_aggressor);
+			}
+		}
+	}
+
+	// Instantly kill the character
+	public void TakeFullDamage(string _tag = "Enemy")
+	{
+		health = 0;
+
+		UpdateHealthBar(_tag);
+		PlayDeathEffect();
+		Kill(_tag);
+	}
+
+	// Play the obj death effect
+	private void PlayDeathEffect()
+	{
+		if (deathEffect != null)
+		{
+			Instantiate(deathEffect, transform.position, transform.rotation);
+		}
+	}
+
+	// Play invincible effect
+	private void PlayInvincibleEffect()
+	{
+		if (invicibilityCounter > 0)
+		{
+			invicibilityCounter -= Time.deltaTime;
+			flashCounter -= Time.deltaTime;
+
+			if (flashCounter <= 0)
+			{
+				foreach (var sprite in characterSprites)
+				{
+					sprite.enabled = !sprite.enabled;
+				}
+
+				flashCounter = flashLenght;
 			}
 
-			if (tag == "Enemy")
+			if (invicibilityCounter <= 0)
 			{
-				Destroy(gameObject);
+				foreach (var sprite in characterSprites)
+				{
+					sprite.enabled = true;
+				}
+
+				flashCounter = 0;
+
+				if (isPlayer)
+					Startup.playerController.DisableKnockBack();
 			}
-			else
-			{
-				gameObject.SetActive(false);
-			}
+		}
+	}
+
+	// Destroy or deactivate the obj
+	private void Kill(string _tag)
+	{
+		if (_tag == "Enemy")
+		{
+			Destroy(gameObject);
+		}
+		else
+		{
+			gameObject.SetActive(false);
+		} // Player
+	}
+
+	// Exports current obj health amount
+	public int GetHealth()
+	{
+		return health;
+	}
+
+	// Handle Health bar
+	private void UpdateHealthBar(string _tag)
+	{
+		if (_tag == "Player")
+		{
+			UIController.instance.UpdateHealthBar(health);
+		}
+	}
+
+	// Handle character's knock back after take damage
+	private void KnockBack(Transform enemy)
+	{
+		if (isPlayer)
+			Startup.playerController.EnableKnockBack();
+
+		rb.AddForce(Vector2.up * verticalKnockBackForce, ForceMode2D.Impulse);
+
+		if (transform.position.x < enemy.position.x)
+		{
+			rb.AddForce(Vector2.left * horizontalKnockBackForce, ForceMode2D.Impulse);
+		}
+		else
+		{
+			rb.AddForce(Vector2.right * horizontalKnockBackForce, ForceMode2D.Impulse);
 		}
 	}
 }

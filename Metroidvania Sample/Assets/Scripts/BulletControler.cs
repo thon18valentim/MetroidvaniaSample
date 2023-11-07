@@ -32,7 +32,7 @@ public class BulletControler : MonoBehaviour
 	{
 		if (collision.tag == "Enemy")
 		{
-			collision.GetComponent<HealthController>().TakeDamage(damage);
+			collision.GetComponent<HealthController>().TakeDamage(damage, transform);
 		}
 
 		Instantiate(impactEffect, transform.position, Quaternion.identity);

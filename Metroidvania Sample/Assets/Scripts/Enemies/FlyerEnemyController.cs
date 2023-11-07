@@ -12,6 +12,8 @@ public class FlyerEnemyController : MonoBehaviour
 	public int damage;
 	private Transform player;
 
+	public GameObject attackEffect;
+
 	private void Awake()
 	{
 		rb = GetComponent<Rigidbody2D>();
@@ -49,7 +51,8 @@ public class FlyerEnemyController : MonoBehaviour
 				transform.rotation = Quaternion.Slerp(transform.rotation, targetRot, turnSpeed * Time.deltaTime);
 			}
 
-			transform.position = Vector3.MoveTowards(transform.position, player.position, moveSpeed * Time.deltaTime);
+			//transform.position = Vector3.MoveTowards(transform.position, player.position, moveSpeed * Time.deltaTime);
+			transform.position += -transform.right * moveSpeed * Time.deltaTime;
 		}
 	}
 
@@ -57,7 +60,20 @@ public class FlyerEnemyController : MonoBehaviour
 	{
 		if (collision.gameObject.tag == "Player")
 		{
-			collision.gameObject.GetComponent<HealthController>().TakeDamage(damage, "Player");
+			collision.gameObject.GetComponent<HealthController>().TakeDamage(damage, transform, "Player");
+		}
+
+		// The flyer dies when it hits anything
+		PlayAttackEffect();
+		gameObject.GetComponent<HealthController>().TakeFullDamage();
+	}
+
+	// Play attack effect if it exists
+	private void PlayAttackEffect()
+	{
+		if (attackEffect != null)
+		{
+			Instantiate(attackEffect, transform.position, transform.rotation);
 		}
 	}
 }

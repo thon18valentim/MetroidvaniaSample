@@ -94,7 +94,7 @@ public class WalkerEnemyController : MonoBehaviour
 	{
 		if (collision.gameObject.tag == "Player")
 		{
-			collision.gameObject.GetComponent<HealthController>().TakeDamage(damage, "Player");
+			collision.gameObject.GetComponent<HealthController>().TakeDamage(damage, transform, "Player");
 		}
 	}
 

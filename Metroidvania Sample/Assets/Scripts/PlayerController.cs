@@ -36,6 +36,8 @@ public class PlayerController : MonoBehaviour
 	public Transform bombPosition;
 	public GameObject bomb;
 
+	private bool isKnockBack = true;
+
 	private void Awake()
 	{
 		rb = GetComponent<Rigidbody2D>();
@@ -54,8 +56,8 @@ public class PlayerController : MonoBehaviour
 	// Move action according to speed
 	private void Move()
 	{
-		// Cannot move during a dash
-		if (dashCounter > 0)
+		// Cannot move during a dash || Player can't move while is knock back
+		if (dashCounter > 0 || isKnockBack)
 			return;
 
 		rb.velocity = new Vector2(Input.GetAxisRaw("Horizontal") * moveSpeeed, rb.velocity.y);
@@ -211,5 +213,27 @@ public class PlayerController : MonoBehaviour
 
 			ballAnim.SetFloat("speed", Mathf.Abs(rb.velocity.x));
 		}
+	}
+
+	// Exports player's current health amount
+	public int GetCurrentHealth()
+	{
+		return GetComponent<HealthController>().GetHealth();
+	}
+
+	// Enable player KnockBack
+	public void EnableKnockBack()
+	{
+		isKnockBack = true;
+		isJumping = false;
+
+		anim.SetFloat("speed", 0f);
+		anim.SetBool("isJumping", isJumping);
+	}
+
+	// Disable player KnockBack
+	public void DisableKnockBack()
+	{
+		isKnockBack = false;
 	}
 }
