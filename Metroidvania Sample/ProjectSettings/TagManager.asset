@@ -18,8 +18,8 @@ TagManager:
   - Player
   - Destructible
   - PickUps
-  - 
-  - 
+  - Checkpoints
+  - Enemy
   - 
   - 
   - 

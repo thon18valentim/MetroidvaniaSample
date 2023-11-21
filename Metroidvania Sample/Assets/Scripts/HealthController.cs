@@ -126,7 +126,7 @@ public class HealthController : MonoBehaviour
 		}
 		else
 		{
-			gameObject.SetActive(false);
+			Startup.sceneController.PlayerRespawn();
 		} // Player
 	}
 
@@ -161,5 +161,27 @@ public class HealthController : MonoBehaviour
 		{
 			rb.AddForce(Vector2.right * horizontalKnockBackForce, ForceMode2D.Impulse);
 		}
+	}
+
+	// Fill characters' health
+	public void FillHealth()
+	{
+		if (isPlayer)
+		{
+			totalHealt = PlayerProfile.PlayerMaxLife;
+			UIController.instance.UpdateHealthBar(totalHealt);
+		}
+
+		health = totalHealt;
+	}
+
+	// Handle objects healing
+	public void Heal(int healAmount, string _tag = "Player")
+	{
+		health += healAmount;
+		if (health > totalHealt)
+			healAmount = totalHealt;
+
+		UpdateHealthBar(_tag);
 	}
 }

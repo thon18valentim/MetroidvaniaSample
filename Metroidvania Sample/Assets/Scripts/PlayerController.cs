@@ -16,6 +16,7 @@ public class PlayerController : MonoBehaviour
 	public Transform shotCheckPoint;
 
 	private bool canDoubleJump;
+	private bool canMove;
 
 	public float dashSpeed, dashTime;
 	public float dashCooldown;
@@ -36,21 +37,33 @@ public class PlayerController : MonoBehaviour
 	public Transform bombPosition;
 	public GameObject bomb;
 
-	private bool isKnockBack = true;
+	private bool isKnockBack = false;
+
+	public HealthController healthController;
 
 	private void Awake()
 	{
 		rb = GetComponent<Rigidbody2D>();
+		healthController = GetComponent<HealthController>();
+
+		canMove = true;
 	}
 
 	void Update()
 	{
-		Dash();
-		Move();
-		Flip();
-		Jump();
-		Shot();
-		BallMode();
+		if (canMove)
+		{
+			Dash();
+			Move();
+			Flip();
+			Jump();
+			Shot();
+			BallMode();
+		}
+		else
+		{
+			rb.velocity = Vector2.zero;
+		}
 	}
 
 	// Move action according to speed
@@ -67,6 +80,9 @@ public class PlayerController : MonoBehaviour
 	// Handle dash action
 	private void Dash()
 	{
+		if (isKnockBack)
+			return;
+
 		if (dashRechargeCounter > 0)
 		{
 			dashRechargeCounter -= Time.deltaTime;
@@ -100,6 +116,9 @@ public class PlayerController : MonoBehaviour
 	// Jump action and ground detecting
 	private void Jump()
 	{
+		if (isKnockBack)
+			return;
+
 		isJumping = !Physics2D.OverlapCircle(groundCheckPoint.position, .2f, groundLayer);
 
 		if (Input.GetButtonDown("Jump") && (!isJumping || (canDoubleJump && PlayerProfile.AbilityManager.IsAbilityUnlocked(AbilitiyType.DoubleJump))))
@@ -140,6 +159,9 @@ public class PlayerController : MonoBehaviour
 	// Shots a bullet in the direction which the player is looking
 	private void Shot()
 	{
+		if (isKnockBack)
+			return;
+
 		if (Input.GetButtonDown("Fire1"))
 		{
 			if (standing.activeSelf)
@@ -159,6 +181,9 @@ public class PlayerController : MonoBehaviour
 	// Handle bomb throwing
 	private void DroppingBombs()
 	{
+		if (isKnockBack)
+			return;
+
 		if (!ball.activeSelf || !PlayerProfile.AbilityManager.IsAbilityUnlocked(AbilitiyType.DropBomb))
 			return;
 
@@ -179,6 +204,9 @@ public class PlayerController : MonoBehaviour
 	// Handle ball mode
 	private void BallMode()
 	{
+		if (isKnockBack)
+			return;
+
 		if (!ball.activeSelf)
 		{
 			if (Input.GetAxisRaw("Vertical") < -.9f && PlayerProfile.AbilityManager.IsAbilityUnlocked(AbilitiyType.BecomeBall))
@@ -235,5 +263,17 @@ public class PlayerController : MonoBehaviour
 	public void DisableKnockBack()
 	{
 		isKnockBack = false;
+	}
+
+	// Disable player movement
+	public void DisablePlayerMovement()
+	{
+		canMove = false;
+	}
+
+	// Enable player movement
+	public void EnablePlayerMovement()
+	{
+		canMove = true;
 	}
 }
